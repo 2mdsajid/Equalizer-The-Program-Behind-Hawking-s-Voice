@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Equalizer</title>
+  <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
+  <style type="text/css" media="all">
+    button {
+      height: 40px;
+      width: 80px;
+      margin: 10px 130px;
+      font-size: 1.2rem;
+    }
+
+    .flex {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .box,
+    .text {
+      height: 400px;
+      width: 320px;
+      border: solid 0px black;
+      margin: 0 auto;
+    }
+
+    .text {
+      margin: 10px auto;
+      height: 40px;
+      border: solid 1px black;
+    }
+
+    .alphabet,
+    .numeric {
+      width: 100%;
+      height: 50%;
+      border: solid 0px black;
+      margin: 0 auto;
+    }
+    
+    .alphabet{
+      margin-bottom: 3px; 
+    }
+
+    .box div div {
+      height: 20%;
+      width: 100%;
+      flex-direction: row;
+      border: solid 1px black;
+    }
+
+    .box div div div {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .color {
+      background: #93DD8B;
+    }
+
+
+      p,h2{
+      margin: 10px auto;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>EQUALIZER</h2>
+  <div class="box flex"></div>
+  <div class="text"></div>
+  <button class="btn2" type="submit">Click</button>
+  <p>( Double tap to clear )</p>
+  <script type="text/javascript" charset="utf-8">
+    //KEYBOARD LETTERS
+    alpha = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 1, 2, 3, '@', '#', 4, 5, 6, '$', '+', 7, 8, 9, '(', ')', '/', 0, '_', '[', ']', ':', '&', '✓', '?', ' ']
+
+    //INITIALIZING SOME VARIABLES
+    boxes = []
+    cols = []
+    rows = []
+
+    //CREATE AN ELEMENT INSIDE DOM
+    function create(classList, attr = 'div') {
+      let div = document.createElement(attr)
+      div.classList = classList
+      return div
+    }
+
+
+    //CREATE THE TABLE WITH THE LETTERS
+    m = 0
+    for (i = 0; i < 2; i++) {
+      let box = create('alphabet flex')
+      boxlist = []
+      boxlist2 = []
+      boxes.push(box)
+
+      for (j = 0; j < 5; j++) {
+        let row = create('flex')
+        rowlist = []
+        boxlist2.push(row)
+
+        for (k = 0; k < 5; k++) {
+          let col = create('')
+
+          if (m > 50) {
+            m = 0
+          }
+          col.textContent = alpha[m]
+          m++
+
+          rowlist.push(col)
+          row.append(col)
+        }
+        boxlist.push(rowlist)
+        box.append(row)
+      }
+      rows.push(boxlist2)
+      cols.push(boxlist)
+      $('.box').append(box)
+    }
+
+
+    //SHUFFLE THE ROW/COL IN TABLE
+    function first(boxe) {
+      i = pos[0]
+
+      if (i > boxe.length - 1) {
+        i = 0
+        boxe[boxe.length - 1].classList.remove('color')
+      }
+
+      if (i > 0) {
+        boxe[i - 1].classList.remove('color')
+      }
+
+      boxe[i].classList.add('color')
+      i++
+
+      pos.unshift(i)
+      pos.pop()
+    }
+
+    //INITIALIZING VARIABLES FOR SHUFFLE
+    pos = [0]
+    x = []
+    l = [boxes]
+    sen = ''
+
+    //ADDING A BUTTON TO SHUFFLE ON CLICK
+    let btn = document.createElement('button')
+    btn.className = 'btn1'
+    btn.style.opacity = '0'
+    $('body').append(btn)
+
+    //ADD CLICK EVENT TO SHUFFLE BUTTON
+    $('.btn1').on('click', () => {
+      first(l[0])
+    })
+
+    //CLICKING THE BUTTON PERIODICALLY
+    setInterval(() => {
+      $('.btn1').click()
+    }, 500)
+
+
+    /* ADDING SELECTION BUTTON EVENT
+    WITH DOUBLE CLICK TO CLEAR AND INITIATE FROM BEGINNING */
+    $('.btn2').on('click', () => {
+
+      if (l[0][pos[0] - 1].classList.contains('color')) {
+        l[0][pos[0] - 1].classList.remove('color')
+
+        l.unshift($(l[0][pos[0] - 1]).children())
+
+        x.push(pos[0] - 1)
+        pos = [0]
+      }
+
+      if (l.length == 4) {
+        l = [boxes]
+        sen += $(cols[x[0]][x[1]][x[2]]).text()
+        $('.text').text(sen)
+        x = []
+      }
+    }).on('dblclick', () => {
+      sen = ''
+      $('.text').text(sen)
+      l = [boxes]
+      pos = [0]
+      x = []
+      $('.btn1').click()
+    })
+  </script>
+</body>
+
+</html>
